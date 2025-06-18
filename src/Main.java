@@ -35,7 +35,19 @@ public class Main {
     // </editor-fold>
 
     // <editor-fold desc="GREEDY">
+    /*
+     * Estrategia utilizada:
+     * Se usa Greedy para intentar encontrar una solución óptima sin necesidad de probar todas las combinaciones posibles.
+     * Se decidió ordenar los datos de mayor a menor en una cola de prioridad para poder acceder a los datos de forma directa.
+     * Se consideró en este caso que la mejor opción entre las posibilidades restantes era tomar siempre la máquina que pudiera hacer más piezas y que cumpliera con las condiciones de poda (que no sobren piezas).
+     *
+     * El algoritmo termina una vez que se cumple la condición de que se alcance la cantidad de piezas necesarias o cuando ya no queda ningún candidato factible.
+     */
     public static List<Maquina> greedy(List<Maquina> maquinas) {
+        /*Complejidad:
+         - Crear la priority queue: O(n log n) (por el addAll en una heap)
+         - Cada extracción poll() de la heap: O(log n)
+         - En el peor caso, se procesan todas las máquinas => O(n log n)*/
         List<Maquina> solucion = new ArrayList<>();
         PriorityQueue<Maquina> candidatos = new PriorityQueue<>((a, b) -> b.getCantidad_piezas() - a.getCantidad_piezas());
         candidatos.addAll(maquinas);
@@ -65,8 +77,21 @@ public class Main {
     // </editor-fold>
 
     // <editor-fold desc="BACKTRACKING">
+    /*
+     * Estrategia utilizada:
+     * Se usa Backtracking para probar todas las combinaciones posibles de máquinas.
+     * En cada paso del algoritmo, se decide si se agrega una máquina o no, siempre y cuando no se supere el resultado objetivo.
+     * Si se llega a un estado final (una combinación completa), se compara la solución actual con la mejor solución encontrada hasta el momento.
+     * La solución actual reemplaza a la mejor solo si utiliza una menor cantidad de máquinas.
+     *
+     * Además, se utiliza un enfoque greedy al inicio para obtener una solución inicial rápidamente,
+     * lo cual ayuda a reducir el espacio de búsqueda, ya que permite podar ramas que no puedan superar esa solución.
+     */
     private static void back_recursivo(List<Maquina> maquinas, List<Maquina> sol_parcial,
                                        List<Maquina> sol_final, int piezasActuales) {
+        /*Complejidad en el peor caso: O(b^d), donde:
+         - b es el número de máquinas (ramificación)
+         - d es la profundidad máxima del árbol (cantidad de piezas necesarias)*/
         estadosBacktracking++;
 
         if (piezasActuales == CANTIDAD_PIEZAS && (sol_final.isEmpty() || sol_parcial.size() < sol_final.size())) {
@@ -105,6 +130,9 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        // Complejidad:
+        // - Greedy: O(n log n + k)
+        // - Backtracking: O(b^d)
         List<Maquina> maquinas = leerArchivo(CSV_FILE);
 
         if (maquinas == null || maquinas.isEmpty()) {
